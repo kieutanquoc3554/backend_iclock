@@ -609,7 +609,7 @@ app.post("/resetpassword", async (req, res) => {
     }
 
     // Cập nhật mật khẩu
-    user.password = newPassword;
+     user.password = hashUserPassword(newPassword);
     await user.save();
 
     res
