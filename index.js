@@ -606,15 +606,14 @@ app.post("/resetpassword", async (req, res) => {
       return res
         .status(404)
         .json({ success: false, errors: "Không thể tìm thấy người dùng" });
-    }
-
-    // Cập nhật mật khẩu
+    }else{
+      // Cập nhật mật khẩu
      user.password = hashUserPassword(newPassword);
     await user.save();
-
     res
       .status(200)
       .json({ success: true, message: "Mật khẩu đã được thay đổi" });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, errors: "Lỗi server" });
