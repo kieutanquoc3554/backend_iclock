@@ -489,14 +489,14 @@ app.put("/changepassword/:_id", async (req, res) => {
     const user = await Users.findById(_id);
 
     // Kiem tra mat khau cu co trung khop khong
-    if (user.password !== oldPassword) {
+    if (user.password !== hashUserPassword(oldPassword)) {
       return res
         .status(400)
         .json({ success: false, errors: "Mật khẩu cũ không đúng" });
     }
 
     // Cap nhat mat khau
-    user.password = newPassword;
+    user.password = hashUserPassword(newPassword);
     await user.save();
     res.json({ success: true, message: "Mật khẩu đã được cập nhật" });
   } catch (error) {
