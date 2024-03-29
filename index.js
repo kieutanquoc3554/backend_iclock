@@ -385,7 +385,7 @@ app.post("/addToCart", fetchUser, async (req, res) => {
   let userData = await Users.findOne({ _id: req.user._id });
   userData.cartData[req.body.itemId] += 1;
   await Users.findOneAndUpdate(
-    { _id: req.user.id },
+    { _id: req.user._id },
     { cartData: userData.cartData }
   );
   res.send("Đã thêm");
@@ -394,12 +394,12 @@ app.post("/addToCart", fetchUser, async (req, res) => {
 // endpoint xoá sản phẩm khỏi giỏ hàng
 app.post("/removefromcart", fetchUser, async (req, res) => {
   console.log("Đã xoá", req.body.itemId);
-  let userData = await Users.findOne({ _id: req.user.id });
+  let userData = await Users.findOne({ _id: req.user._id });
   if (userData.cartData[req.body.itemId] > 0) {
     userData.cartData[req.body.itemId] -= 1;
   }
   await Users.findOneAndUpdate(
-    { _id: req.user.id },
+    { _id: req.user._id },
     { cartData: userData.cartData }
   );
   res.send("Đã xoá khỏi giỏ hàng");
