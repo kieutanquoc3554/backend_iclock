@@ -226,7 +226,6 @@ app.get("/users", async (req, res) => {
   res.send(users);
 });
 
-
 // endpoing đăng ký người dùng
 app.post("/signup", async (req, res) => {
   let check = await Users.findOne({ email: req.body.email });
@@ -237,7 +236,7 @@ app.post("/signup", async (req, res) => {
   for (let i = 0; i < 300; i++) {
     cart[i] = 0;
   }
-  const password = await req.body.password;
+  const password = req.body.password;
   const user = new Users({
     name: req.body.username,
     email: req.body.email,
@@ -259,13 +258,13 @@ app.post("/signup", async (req, res) => {
 
 // endpoint đăng nhập
 app.post("/login", async (req, res) => {
-  const {password} = req.body;
+  const { password } = req.body;
   let user = await Users.findOne({ email: req.body.email });
   if (user) {
     if (user.password === password) {
       const data = {
         user: {
-          id: user._id,
+          _id: user._id,
           role: user.role,
           email: user.email,
         },
@@ -385,7 +384,7 @@ app.post("/addToCart", fetchUser, async (req, res) => {
   let userData = await Users.findOne({ _id: req.user._id });
   userData.cartData[req.body.itemId] += 1;
   await Users.findOneAndUpdate(
-    { _id: req.user._id },
+    { _id: req.user.id },
     { cartData: userData.cartData }
   );
   res.send("Đã thêm");
@@ -394,12 +393,12 @@ app.post("/addToCart", fetchUser, async (req, res) => {
 // endpoint xoá sản phẩm khỏi giỏ hàng
 app.post("/removefromcart", fetchUser, async (req, res) => {
   console.log("Đã xoá", req.body.itemId);
-  let userData = await Users.findOne({ _id: req.user._id });
+  let userData = await Users.findOne({ _id: req.user.id });
   if (userData.cartData[req.body.itemId] > 0) {
     userData.cartData[req.body.itemId] -= 1;
   }
   await Users.findOneAndUpdate(
-    { _id: req.user._id },
+    { _id: req.user.id },
     { cartData: userData.cartData }
   );
   res.send("Đã xoá khỏi giỏ hàng");
@@ -477,15 +476,15 @@ app.put("/changepassword/:_id", async (req, res) => {
 
     // Kiem tra mat khau cu co trung khop khong
     if (user.password !== oldPassword) {
-      return res
-        .status(400)
-        .json({ success: false, errors: "Mật khẩu cũ không đúng" });
-    }
-    else{
-       // Cap nhat mat khau
+      return res.status(400).json({
+        success: false,
+        errors: "Mật khẩu cũ không đúng",
+      });
+    } else {
+      // Cap nhat mat khau
       user.password = newPassword;
       await user.save();
-      res.json({ success: true, message: "Mật khẩu đã được cập nhật" }); 
+      res.json({ success: true, message: "Mật khẩu đã được cập nhật" });
     }
   } catch (error) {
     console.error(error.message);
@@ -594,14 +593,15 @@ app.post("/resetpassword", async (req, res) => {
       return res
         .status(404)
         .json({ success: false, errors: "Không thể tìm thấy người dùng" });
-    }else{
-      // Cập nhật mật khẩu
-     user.password = newPassword;
+    }
+
+    // Cập nhật mật khẩu
+    user.password = newPassword;
     await user.save();
+
     res
       .status(200)
       .json({ success: true, message: "Mật khẩu đã được thay đổi" });
-    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, errors: "Lỗi server" });
