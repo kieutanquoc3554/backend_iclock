@@ -608,7 +608,7 @@ app.post("/resetpassword", async (req, res) => {
         .json({ success: false, errors: "Không thể tìm thấy người dùng" });
     }else{
       // Cập nhật mật khẩu
-     user.password = hashUserPassword(newPassword);
+     user.password = newPassword;
     await user.save();
     res
       .status(200)
